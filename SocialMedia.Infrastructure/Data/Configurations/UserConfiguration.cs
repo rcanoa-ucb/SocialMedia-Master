@@ -7,8 +7,7 @@ using System.Text;
 
 namespace SocialMedia.Infrastructure.Data.Configurations
 {
-    public class UserConfiguration :
-        IEntityTypeConfiguration<User>
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> entity)
         {

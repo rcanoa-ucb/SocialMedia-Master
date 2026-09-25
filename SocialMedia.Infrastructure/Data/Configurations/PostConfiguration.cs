@@ -1,14 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SocialMedia.Core.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SocialMedia.Infrastructure.Data.Configurations
 {
-    public class CommentConfiguration :
-        IEntityTypeConfiguration<Post>
+    public class PostConfiguration : IEntityTypeConfiguration<Post>
+
     {
         public void Configure(EntityTypeBuilder<Post> entity)
         {

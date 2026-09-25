@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
+﻿using Microsoft.EntityFrameworkCore;
 using SocialMedia.Core.Entities;
+using SocialMedia.Infrastructure.Data.Configurations;
 
 namespace SocialMedia.Infrastructure.Data;
 
@@ -30,7 +27,8 @@ public partial class SocialMediaContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            Assembly.GetExecutingAssembly());
+        modelBuilder.ApplyConfiguration(new CommentConfiguration());
+        modelBuilder.ApplyConfiguration(new PostConfiguration());
+        modelBuilder.ApplyConfiguration(new UserConfiguration());
     }
 }
