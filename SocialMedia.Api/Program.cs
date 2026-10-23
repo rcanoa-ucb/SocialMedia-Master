@@ -2,7 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Infrastructure.Data;
+using SocialMedia.Infrastructure.Mappings;
 using SocialMedia.Infrastructure.Repositories;
+using SocialMedia.Services.Interfaces;
+using SocialMedia.Services.Services;
+using SocialMedia.Services.Validators;
 
 namespace SocialMedia.Api
 {
@@ -19,10 +23,20 @@ namespace SocialMedia.Api
             #endregion
 
             // Add services to the container.
-            builder.Services.AddTransient<IPostRepository, PostRepository>();
+            //builder.Services.AddTransient<IPostRepository, PostRepository>();
+            //builder.Services.AddTransient<IUserRepository, UserRepository>();
+            builder.Services.AddTransient<IPostService, PostService>();
+            builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+            builder.Services.AddAutoMapper(typeof(PostProfile).Assembly);
+
+            //Registrar Validadores de FluentValidation
+            builder.Services.AddScoped<PostDtoValidator>();
+            builder.Services.AddScoped<CrearPostDtoValidator>();
+            builder.Services.AddScoped<ActualizarPostDtoValidator>();
 
             var app = builder.Build();
 
