@@ -31,8 +31,8 @@ namespace SocialMedia.Services.Validators
                 .MaximumLength(500).WithMessage("La descripción no puede exceder los 500 caracteres.");
 
             // Validación para Image (opcional)
-            RuleFor(x => x.Image)
-                .Must(BeAValidUrl).When(x => !string.IsNullOrEmpty(x.Image))
+            RuleFor(x => x.Imagen)
+                .Must(BeAValidUrl).When(x => !string.IsNullOrEmpty(x.Imagen))
                 .WithMessage("La URL de la imagen no es válida. Debe comenzar con http:// o https://");
         }
 

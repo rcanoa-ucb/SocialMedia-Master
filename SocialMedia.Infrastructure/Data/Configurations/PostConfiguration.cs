@@ -17,7 +17,7 @@ namespace SocialMedia.Infrastructure.Data.Configurations
 
             entity.Property(e => e.Date).HasColumnType("datetime");
             entity.Property(e => e.Description).HasMaxLength(1000);
-            entity.Property(e => e.Imagen).HasMaxLength(500);
+            entity.Property(e => e.Image).HasMaxLength(500);
 
             entity.HasOne(d => d.User).WithMany(p => p.Posts)
                 .HasForeignKey(d => d.UserId)

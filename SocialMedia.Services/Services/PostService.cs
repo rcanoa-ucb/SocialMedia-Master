@@ -1,5 +1,8 @@
 ﻿using SocialMedia.Core.Entities;
+using SocialMedia.Core.Exceptions;
+using SocialMedia.Core.Helpers;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.QueryFilters;
 using SocialMedia.Services.Interfaces;
 
 namespace SocialMedia.Services.Services
@@ -21,9 +24,27 @@ namespace SocialMedia.Services.Services
             _userRepository = userRepository;
         }
 
-        public async Task<IEnumerable<Post>> GetAllPostsAsync()
+        public async Task<IEnumerable<Post>> GetAllPostsAsync(PostQueryFilter? filters)
         {
-            return await _postRepository.GetAll();
+            var posts = await _postRepository.GetAll();
+
+            if (filters.userId != null)
+            {
+                posts = posts.Where(x => x.UserId == filters.userId);
+            }
+            if (filters.Date != null)
+            {
+                string fechaAux = Procesos.ParseFechaFlexible(filters.Date);
+                if (fechaAux != null)
+                    posts = posts.Where(x => x.Date.ToShortDateString() == Convert.ToDateTime(fechaAux).ToShortDateString());
+            }
+            if (filters.Description != null)
+            {
+                posts = posts.Where(x => x.Description.ToLower().Contains(filters.Description.ToLower()));
+            }
+
+            return posts;
+
         }
 
         public async Task<Post> GetPostsByIdAsync(int id)
@@ -36,12 +57,12 @@ namespace SocialMedia.Services.Services
             var user = await _userRepository.GetById(post.UserId);
             if (user == null)
             {
-                throw new Exception("El usuario no existe");
+                throw new BusinessException("El usuario no existe");
             }
 
             if (ContainsForbiddenContent(post.Description))
             {
-                throw new Exception("El contenido no es permitido");
+                throw new BusinessException("El contenido no es permitido");
             }
 
             await _postRepository.Add(post);

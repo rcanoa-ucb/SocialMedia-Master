@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace SocialMedia.Core.QueryFilters
+{
+    public class PostQueryFilter
+    {
+        public int? userId { get; set; }
+        public string? Date { get; set; }
+        public string? Description { get; set; }
+    }
+}

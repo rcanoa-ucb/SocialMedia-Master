@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
+using SocialMedia.Core.Exceptions;
 using SocialMedia.Core.Interfaces;
+using SocialMedia.Core.QueryFilters;
 using SocialMedia.Services.Interfaces;
 using SocialMedia.Services.Validators;
 
@@ -152,9 +155,9 @@ namespace SocialMedia.Api.Controllers
 
         #region Con Mapper
         [HttpGet("dto/mapper/")]
-        public async Task<IActionResult> GetPostsDtoMapper()
+        public async Task<IActionResult> GetPostsDtoMapper([FromQuery] PostQueryFilter? filters)
         {
-            var posts = await _postService.GetAllPostsAsync();
+            var posts = await _postService.GetAllPostsAsync(filters);
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             return Ok(postsDto);
         }
@@ -177,15 +180,21 @@ namespace SocialMedia.Api.Controllers
             var validationResult = await _crearValidator.ValidateAsync(postDto);
             if (!validationResult.IsValid)
             {
-                return BadRequest(new
+                throw new BusinessException(message: "Error de validación", details: validationResult.Errors.Select(e => new
                 {
-                    message = "Error de validación",
-                    errors = validationResult.Errors.Select(e => new
-                    {
-                        field = e.PropertyName,
-                        error = e.ErrorMessage
-                    })
-                });
+                    field = e.PropertyName,
+                    error = e.ErrorMessage
+                }));
+
+                //return BadRequest(new
+                //{
+                //    message = "Error de validación",
+                //    errors = validationResult.Errors.Select(e => new
+                //    {
+                //        field = e.PropertyName,
+                //        error = e.ErrorMessage
+                //    })
+                //});
             }
 
             try
@@ -195,6 +204,11 @@ namespace SocialMedia.Api.Controllers
 
                 var resultDto = _mapper.Map<PostDto>(post);
                 return CreatedAtAction(nameof(GetPostByIdDtoMapper), new { id = post.Id }, resultDto);
+            }
+            catch (BusinessException)
+            {
+                // Re-lanzamos para que el Middleware genere la respuesta estructurada
+                throw;
             }
             catch (Exception ex)
             {

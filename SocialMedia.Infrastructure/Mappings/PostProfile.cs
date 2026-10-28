@@ -10,14 +10,16 @@ namespace SocialMedia.Infrastructure.Mappings
         public PostProfile()
         {
             CreateMap<Post, PostDto>()
-                       .ForMember(dest => dest.Date,
-                           opt => opt.ConvertUsing<DateTimeToStringConverter, DateTime>())
-                       .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.Imagen));
+                .ForMember(dest => dest.Imagen,
+                opt => opt.MapFrom(src => src.Image))
+                .ForMember(dest => dest.Date,
+                    opt => opt.ConvertUsing<DateTimeToStringConverter, DateTime>());
 
             CreateMap<PostDto, Post>()
+                .ForMember(dest => dest.Image,
+                opt => opt.MapFrom(src => src.Imagen))
                 .ForMember(dest => dest.Date,
-                    opt => opt.ConvertUsing<StringToDateTimeConverter, string>())
-                .ForMember(dest => dest.Imagen, opt => opt.MapFrom(src => src.Image));
+                    opt => opt.ConvertUsing<StringToDateTimeConverter, string>());
         }
     }
 

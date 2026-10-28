@@ -13,7 +13,7 @@ public partial class Post : BaseEntity
 
     public string Description { get; set; } = null!;
 
-    public string? Imagen { get; set; }
+    public string? Image { get; set; }
 
     public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
