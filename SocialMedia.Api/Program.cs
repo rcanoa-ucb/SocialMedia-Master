@@ -28,6 +28,7 @@ namespace SocialMedia.Api
             //builder.Services.AddTransient<IUserRepository, UserRepository>();
             builder.Services.AddTransient<IPostService, PostService>();
             builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

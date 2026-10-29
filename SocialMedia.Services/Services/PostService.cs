@@ -11,22 +11,31 @@ namespace SocialMedia.Services.Services
     {
         //public readonly IPostRepository _postRepository;
         //public readonly IUserRepository _userRepository;
-        public readonly IBaseRepository<Post> _postRepository;
-        public readonly IBaseRepository<User> _userRepository;
+        //public readonly IBaseRepository<Post> _postRepository;
+        //public readonly IBaseRepository<User> _userRepository;
 
-        public PostService(
-            IBaseRepository<Post> postRepository,
-            IBaseRepository<User> userRepository
-            //IPostRepository postRepository, IUserRepository userRepository
-            )
+        public readonly IUnitOfWork _unitOfWork;
+
+        //public PostService(
+        //    IBaseRepository<Post> postRepository,
+        //    IBaseRepository<User> userRepository
+        //    //IPostRepository postRepository, IUserRepository userRepository
+        //    )
+        //{
+        //    _postRepository = postRepository;
+        //    _userRepository = userRepository;
+        //}
+
+        public PostService(IUnitOfWork unitOfWork)
         {
-            _postRepository = postRepository;
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
+
 
         public async Task<IEnumerable<Post>> GetAllPostsAsync(PostQueryFilter? filters)
         {
-            var posts = await _postRepository.GetAll();
+            //var posts = await _postRepository.GetAll();
+            var posts = await _unitOfWork.PostRepository.GetAll();
 
             if (filters.userId != null)
             {
@@ -49,12 +58,14 @@ namespace SocialMedia.Services.Services
 
         public async Task<Post> GetPostsByIdAsync(int id)
         {
-            return await _postRepository.GetById(id);
+            //return await _postRepository.GetById(id);
+            return await _unitOfWork.PostRepository.GetById(id);
         }
 
         public async Task InsertPost(Post post)
         {
-            var user = await _userRepository.GetById(post.UserId);
+            //var user = await _userRepository.GetById(post.UserId);
+            var user = await _unitOfWork.UserRepository.GetById(post.UserId);
             if (user == null)
             {
                 throw new BusinessException("El usuario no existe");
@@ -65,17 +76,30 @@ namespace SocialMedia.Services.Services
                 throw new BusinessException("El contenido no es permitido");
             }
 
-            await _postRepository.Add(post);
+            var userPost = await _unitOfWork.PostRepository.GetAllPostsByUserAsync(post.UserId);
+            if (userPost.Count() < 10)
+            {
+                var lastPost = userPost.OrderByDescending(x => x.Date).FirstOrDefault();
+                if ((DateTime.Now - lastPost.Date).TotalDays < 7)
+                {
+                    throw new Exception("No puedes publicar este post");
+                }
+            }
+
+            await _unitOfWork.PostRepository.Add(post);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task UpdatePost(Post post)
         {
-            await _postRepository.Update(post);
+            await _unitOfWork.PostRepository.Update(post);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeletePost(int id)
         {
-            await _postRepository.Delete(id);
+            await _unitOfWork.PostRepository.Delete(id);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         // Lista de palabras o expresiones no permitidas
